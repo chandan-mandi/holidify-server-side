@@ -44,6 +44,19 @@ async function run() {
             const hotel = await hotelsCollection.findOne(query);
             res.json(hotel)
         })
+        // POST SINGLE PLACE DATA
+        app.post('/addPlace', async(req, res) => {
+            const addedPlace = req.body;
+            const result = await touristPlaces.insertOne(addedPlace)
+            res.json(result);
+        })
+
+        // GET ALL ORDERS DATA
+        app.get('/orders', async(req, res) =>{
+            const cursor = orderCollection.find({});
+            const result = await cursor.toArray();
+            res.send(result);
+        } )
         // POST API / POST ORDER API
         app.post('/order', async(req, res) => {
             const order = req.body;
@@ -52,10 +65,25 @@ async function run() {
             console.log(result);
             res.json(result);
         })
+        // MY ORDERS
+        app.get('/myOrders/:email', async(req, res) => {
+            const result = await orderCollection.find({
+                email: req.params.email,
+            }).toArray();
+            res.send(result)
+        })
+        // DELETE ORDER
+        app.delete('/deleteOrder/:id', async(req, res)=> {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)}
+            const result = await orderCollection.deleteOne(query);
+            res.json(result)
+
+        })
 
     }
     finally {
-        
+        // await client.close()
     }
 }
 run().catch(console.dir);
